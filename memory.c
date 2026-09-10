@@ -36,13 +36,21 @@ void * new_malloc(size_t size) {
             printf("map failed\n");
             return NULL;
         }
-
-
+        
+        m_header* curr = freelist;
+        while(curr != NULL) {
+            if (curr->size == size && curr->in_use == 0) {
+                curr->in_use = 1;
+                return curr;
+            }
+            printf("[%p: size:%lu prev:%p next:%p use:%d]\n", curr, curr->size, curr->prev, curr->next, curr->in_use);
+            curr = curr->next;
+        }
     }
-
     return NULL;
 }
 
 void new_free(void * ptr) {
-
+    m_header* header = (m_header*)ptr;
+    header->in_use = 0;
 }
