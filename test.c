@@ -11,7 +11,9 @@
 // makes a malloc call, uses the memory, and then frees
 int test_one() {
     char *ptr = (char *)new_malloc(SMALL_SIZE);
-    printf("%p\n", ptr);
+
+
+    printf("WTF %p\n", ptr);
     if (!ptr) return 0;
 
     printf("here\n");
