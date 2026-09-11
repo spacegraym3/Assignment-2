@@ -13,10 +13,8 @@ int test_one() {
     char *ptr = (char *)new_malloc(SMALL_SIZE);
 
 
-    printf("WTF %p\n", ptr);
+    printf("%p\n", ptr);
     if (!ptr) return 0;
-
-    printf("here\n");
 
     // use the memory
     memset(ptr, 0xAB, SMALL_SIZE);
