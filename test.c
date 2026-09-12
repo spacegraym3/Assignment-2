@@ -10,6 +10,7 @@
 
 // makes a malloc call, uses the memory, and then frees
 int test_one() {
+    printf("test_one fuck");
     char *ptr = (char *)new_malloc(SMALL_SIZE);
 
 
@@ -159,8 +160,25 @@ int main(int argc, char **argv){
     int passed = 0;
     int test_num = atoi(argv[1]);
     
-    char *test_list[] = {"Test One Malloc","Test Many Malloc", "Test Many Malloc/Free", "Test Many Malloc/Free Stats", "Bench32", "Bench64", "Bench128","Bench256"};
-    int (*test_func[])() = {&test_one, &test_no_free, &test_many, &test_many_output_stats128, &test_many_output_stats32, &test_many_output_stats64, &test_many_output_stats128, &test_many_output_stats256};
+    char *test_list[] = {
+        "Test One Malloc",
+        "Test Many Malloc", 
+        "Test Many Malloc/Free", 
+        "Test Many Malloc/Free Stats", 
+        "Bench32", 
+        "Bench64", 
+        "Bench128",
+        "Bench256"};
+    int (*test_func[])() = {
+        &test_one,                      // 0
+        &test_no_free,                  // 1
+        &test_many,                     // 2
+        &test_many_output_stats,        // 3    
+        &test_many_output_stats128,     // 4
+        &test_many_output_stats32,      // 5
+        &test_many_output_stats64,      // 6
+        &test_many_output_stats128,     // 7
+        &test_many_output_stats256};    // 8
 
     passed += run_test(test_list[test_num], test_func[test_num]);
     int tests_ran = 1;

@@ -25,6 +25,8 @@ void print_freelist() {
 }
 
 void * new_malloc(size_t size) {
+
+    printf("Malloc start.\n");
     if(freelist == NULL) {
         printf("MMAP\n");
          // Use mmap to get anonymous, private memory
@@ -34,9 +36,12 @@ void * new_malloc(size_t size) {
                       MAP_PRIVATE | MAP_ANONYMOUS, // Visibility: private to the process, not file-backed
                       -1,                          // File descriptor: -1 for anonymous mapping
                       0);                          // Offset: 0 for anonymous mapping
+        
+        print_freelist();
 
         if (freelist == MAP_FAILED) {
             printf("map failed\n");
+            freelist = NULL;
             return NULL;
         } else {
             printf("create map\n");
@@ -47,7 +52,7 @@ void * new_malloc(size_t size) {
             print_freelist();
         }
     }
-        
+
     m_header* curr = freelist;
     while(curr != NULL) {
         printf("\tChecking %p: size:%lu prev:%p next:%p use:%d\n", curr, curr->size, curr->prev, curr->next, curr->in_use);
@@ -69,6 +74,7 @@ void * new_malloc(size_t size) {
             }
 
             print_freelist();
+            printf("Malloc return\n");
             return curr;
         }
         curr = curr->next;
@@ -78,6 +84,14 @@ void * new_malloc(size_t size) {
 }
 
 void new_free(void * ptr) {
-    m_header* header = (m_header*)ptr;
-    header->in_use = 0;
+
+    printf("Free start.\n");
+    //print_freelist();
+
+    m_header* headerPtr = (m_header*)ptr;
+    printf("\tFreeing %p: size:%lu prev:%p next:%p use:%d\n", headerPtr, headerPtr->size, headerPtr->prev, headerPtr->next, headerPtr->in_use);
+    ((m_header*)ptr)->in_use = 0;
+    // print_freelist();
+
+    printf("Free end.\n");
 }
