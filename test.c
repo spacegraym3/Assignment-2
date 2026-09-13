@@ -10,7 +10,7 @@
 
 // makes a malloc call, uses the memory, and then frees
 int test_one() {
-    printf("test_one fuck");
+    printf("test_one\n");
     char *ptr = (char *)new_malloc(SMALL_SIZE);
 
 
@@ -53,13 +53,14 @@ int test_no_free() {
 
 // makes many malloc/free calls
 int test_many() {
+    printf("test_many\n");
     for (int i = 0; i < MANY_COUNT; i++) {
         unsigned char *ptr = new_malloc(SMALL_SIZE);
-        printf("recv %p\n",ptr);
+        printf("%d recv %p\n",i,ptr);
         if (!ptr) return 0;
 
         memset(ptr, i % 256, SMALL_SIZE);
-
+ 
         for (int j = 0; j < SMALL_SIZE; j++) {
             if (ptr[j] != i % 256) {
                 printf("Corrupt %d != %d", ptr[j], i%256);
