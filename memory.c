@@ -72,14 +72,13 @@ printf("--> malloc Breaking into smaller chunks.\n");
                 newHeader->in_use = 0;
                 newHeader->prev = curr;
                 newHeader->next = curr->next;
-printf("--> malloc curr->next.\n");
                 
                 curr->next = newHeader;
             }
 
             print_freelist();
             printf("--> malloc success %p\n", curr);
-            return curr;
+            return curr + sizeof(m_header); // return pointer to memory after the header
         }
         curr = curr->next;
     }
@@ -91,8 +90,8 @@ void new_free(void * ptr) {
 
     printf("--> free start.\n");
 
-    m_header* headerPtr = (m_header*)ptr;
-    printf("--> free Freeing %p: size:%lu prev:%p next:%p use:%d\n", headerPtr, headerPtr->size, headerPtr->prev, headerPtr->next, headerPtr->in_use);
+    m_header* headerPtr = (m_header*)ptr - sizeof(m_header);
+    printf("--> Freeing %p: size:%lu prev:%p next:%p use:%d\n", headerPtr, headerPtr->size, headerPtr->prev, headerPtr->next, headerPtr->in_use);
     headerPtr->in_use = 0;
 
     printf("--> free end.\n");

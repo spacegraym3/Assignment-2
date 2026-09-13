@@ -10,12 +10,11 @@
 
 // makes a malloc call, uses the memory, and then frees
 int test_one() {
-    printf("test_one\n");
     char *ptr = (char *)new_malloc(SMALL_SIZE);
-
-
     printf("%p\n", ptr);
     if (!ptr) return 0;
+
+    printf("here\n");
 
     // use the memory
     memset(ptr, 0xAB, SMALL_SIZE);
@@ -53,14 +52,13 @@ int test_no_free() {
 
 // makes many malloc/free calls
 int test_many() {
-    printf("test_many\n");
     for (int i = 0; i < MANY_COUNT; i++) {
         unsigned char *ptr = new_malloc(SMALL_SIZE);
-        printf("%d recv %p\n",i,ptr);
+        printf("recv %p\n",ptr);
         if (!ptr) return 0;
 
         memset(ptr, i % 256, SMALL_SIZE);
- 
+
         for (int j = 0; j < SMALL_SIZE; j++) {
             if (ptr[j] != i % 256) {
                 printf("Corrupt %d != %d", ptr[j], i%256);
@@ -161,25 +159,8 @@ int main(int argc, char **argv){
     int passed = 0;
     int test_num = atoi(argv[1]);
     
-    char *test_list[] = {
-        "Test One Malloc",
-        "Test Many Malloc", 
-        "Test Many Malloc/Free", 
-        "Test Many Malloc/Free Stats", 
-        "Bench32", 
-        "Bench64", 
-        "Bench128",
-        "Bench256"};
-    int (*test_func[])() = {
-        &test_one,                      // 0
-        &test_no_free,                  // 1
-        &test_many,                     // 2
-        &test_many_output_stats,        // 3    
-        &test_many_output_stats128,     // 4
-        &test_many_output_stats32,      // 5
-        &test_many_output_stats64,      // 6
-        &test_many_output_stats128,     // 7
-        &test_many_output_stats256};    // 8
+    char *test_list[] = {"Test One Malloc","Test Many Malloc", "Test Many Malloc/Free", "Test Many Malloc/Free Stats", "Bench32", "Bench64", "Bench128","Bench256"};
+    int (*test_func[])() = {&test_one, &test_no_free, &test_many, &test_many_output_stats128, &test_many_output_stats32, &test_many_output_stats64, &test_many_output_stats128, &test_many_output_stats256};
 
     passed += run_test(test_list[test_num], test_func[test_num]);
     int tests_ran = 1;
