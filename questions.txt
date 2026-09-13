@@ -1,0 +1,1 @@
+(1) ./test 3 fails because the freelist contains a block of 64 bytes that are free.  A malloc call comes in looking for 63 bytes.  This causes my algorthm to split 64 into a 63 byte block and a 1 byte block.  Since the 1 byte block includes the freelist struct, the pointer to the next block is corrupted because it is overwritten by the block 1 creation.

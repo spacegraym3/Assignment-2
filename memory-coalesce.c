@@ -27,6 +27,11 @@ void print_freelist() {
 void * new_malloc(size_t size) {
 
     printf("\n--> malloc size=%lu\n", size);
+
+    // Adjust to be a multiple of 16 bytes for alignment
+    size = (size + 15) & ~((size_t)15);
+
+    printf("\n--> malloc adjusted size=%lu\n", size);
     if(freelist == NULL) {
         printf("--> malloc MMAP\n");
          // Use mmap to get anonymous, private memory
@@ -57,8 +62,10 @@ void * new_malloc(size_t size) {
         if (curr->size >= size && curr->in_use == 0) { // pick first one that is big enough
             printf("--> malloc Found %p: size:%lu prev:%p next:%p use:%d\n", curr, curr->size, curr->prev, curr->next, curr->in_use);
             curr->in_use = 1;
-            if (curr-> size > size) {
-                // Break into smaller chunks
+
+            // Break into smaller chunks only if the leftover space is enough to hold a new header and at least 16 bytes of data
+            if (curr->size >= size + sizeof(m_header) + 16) {
+            //if (curr->size > size) {
 
                 int newSize = curr->size - size - sizeof(m_header);
 
@@ -94,6 +101,26 @@ void new_free(void * ptr) {
     m_header* headerPtr = (m_header*)ptr - sizeof(m_header);
     printf("--> Freeing %p: size:%lu prev:%p next:%p use:%d\n", headerPtr, headerPtr->size, headerPtr->prev, headerPtr->next, headerPtr->in_use);
     headerPtr->in_use = 0;
+
+    // Coalesce with next block if it's free
+    if (headerPtr->next != NULL && headerPtr->next->in_use == 0) {
+        printf("--> Coalescing with next block %p\n", headerPtr->next);
+        headerPtr->size += sizeof(m_header) + headerPtr->next->size;
+        headerPtr->next = headerPtr->next->next;
+        if (headerPtr->next != NULL) {
+            headerPtr->next->prev = headerPtr;
+        }
+    }
+
+    // Coalesce with previous block if it's free
+    if (headerPtr->prev != NULL && headerPtr->prev->in_use == 0) {
+        printf("--> Coalescing with previous block %p\n", headerPtr->prev);
+        headerPtr->prev->size += sizeof(m_header) + headerPtr->size;
+        headerPtr->prev->next = headerPtr->next;
+        if (headerPtr->next != NULL) {
+            headerPtr->next->prev = headerPtr->prev;
+        }
+    } 
 
     printf("--> free end.\n");
 }
