@@ -52,12 +52,15 @@ void * new_malloc(size_t size) {
     print_freelist();
 
     m_header* curr = freelist;
+
     while(curr != NULL) {
         printf("--> malloc Checking %p: size:%lu prev:%p next:%p use:%d\n", curr, curr->size, curr->prev, curr->next, curr->in_use);
         if (curr->size >= size && curr->in_use == 0) { // pick first one that is big enough
             printf("--> malloc Found %p: size:%lu prev:%p next:%p use:%d\n", curr, curr->size, curr->prev, curr->next, curr->in_use);
             curr->in_use = 1;
-            if (curr-> size > size) {
+            // Break into smaller chunks only if the leftover space is enough to hold a new header and at least 16 bytes of data
+            printf("--> malloc curr->size=%lu size=%lu sizeof(m_header)=%lu neededsize=%lu break=%d\n", curr->size, size, sizeof(m_header), size + sizeof(m_header) + 16, curr->size >= size + sizeof(m_header) + 16);
+            if (curr->size >= size + sizeof(m_header) + 16) {
                 // Break into smaller chunks
 
                 int newSize = curr->size - size - sizeof(m_header);
